@@ -40,7 +40,6 @@ for i in tqdm(range(len(V_RMS))):
         delay_time_52 = np.int(np.sqrt(t**2 + (L_52 / v)**2) / delta_t)
         delay_time_53 = np.int(np.sqrt(t**2 + (L_53 / v)**2) / delta_t)
         delay_time_54 = np.int(np.sqrt(t**2 + (L_54 / v)**2) / delta_t)
-        print(delay_time_51, delay_time_52, delay_time_53, delay_time_54)
 
         outvalue_51 = out_51[delay_time_51]
         outvalue_52 = out_52[delay_time_52]

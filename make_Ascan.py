@@ -23,41 +23,59 @@ Amp = np.abs(out_fft)
 Freq = fft.fftfreq(N, 1/fs)
 
 # calculate phase and check the time
-f_phase = np.angle(out_fft)
-f_phase = np.where(f_phase < 0, f_phase + 2 * np.pi, f_phase)
+phi_f = np.angle(out_fft)
+phi_f = np.where(phi_f < 0, phi_f + 2 * np.pi, phi_f)
 
 # calculate time
 sweep_rate = 0.9e9 / 1 # [Hz/s]
-#tau = np.sqrt(f_phase / (2 * np.pi * sweep_rate)) # [s]
-#plt.plot(tau, f_phase)
+tau_f = np.sqrt(phi_f / (2 * np.pi * sweep_rate)) # [s]　← 怪しいことしてる
+#plt.plot(Freq[1:int(N/2)], phi_f[1:int(N/2)], 'o')
+#plt.show()
+
+tau_t = fft.ifft(tau_f)
+tau_t = np.real(tau_t)
+#plt.plot(Time, tau_t, 'o')
+#plt.plot(tau_t, out_51)
+#plt.xscale('log')
+#plt.yscale('log')
+#plt.xlim(0, 2)
 #plt.show()
 
 
+# A-scanできたのか...?
+# make tau_t vs out_51
+tau_t_sort = tau_t[np.argsort(tau_t)]
+out_51_sort = out_51[np.argsort(tau_t)]
+plt.plot(tau_t_sort, out_51_sort)
+#plt.xscale('log')
+plt.xlim(1e-9, 9e-8)
+plt.show()
+
 # make t-phase data
-t_phase = fft.ifft(f_phase)
-t_phase = np.real(t_phase)
-t_phase = np.where(f_phase < 0, f_phase + 2 * np.pi, f_phase)
-#plt.plot(Time, t_phase, 'o')
+phi_t = fft.ifft(phi_f)
+phi_t = np.real(phi_t)
+phi_t = np.where(phi_f < 0, phi_f + 2 * np.pi, phi_f)
+#plt.plot(Time, phi_t, 'o')
 #plt.show()
 
 # calculate delay time
 
-#tau = t_phase / (2 * np.pi * sweep_rate) # [s]
+#tau = phi_t / (2 * np.pi * sweep_rate) # [s]
 
 # assume tau^2 << 1
-#tau = t_phase / (2 * np.pi) \
+#tau = phi_t / (2 * np.pi) \
 #    / (sweep_rate * Time - sweep_rate * t_lac + 0.3e9) # [s]
 
 # consider tqau^2
-term1 = t_phase / sweep_rate / np.pi
+term1 = phi_t / sweep_rate / np.pi
 tau =  term1 + np.sqrt( \
     term1**2 + Time - t_loc + 0.3e9 / sweep_rate)
 
-#plt.plot(t_phase, out_51)
-#plt.plot(tau, t_phase)
-plt.plot(Time, tau, 'o')
+#plt.plot(phi_t, out_51)
+#plt.plot(tau, phi_t)
+#plt.plot(Time, tau, 'o')
 #plt.xscale('log')
-plt.show()
+#plt.show()
 
 
 
@@ -73,12 +91,12 @@ def plt_Freq_data():
     ax[0].set_ylabel('Amplitude', size = 14)
     ax[0].set_xscale('log')
 
-    ax[1].plot(Freq[1:int(N/2)], f_phase[1:int(N/2)])
+    ax[1].plot(Freq[1:int(N/2)], phi_f[1:int(N/2)])
     ax[1].set_xlabel('Frequency [Hz]', size = 14)
     ax[1].set_ylabel('Phase', size = 14)
     ax[1].set_xscale('log')
 
-    ax[2].plot(Freq[1:int(N/2)], t_phase[1:int(N/2)])
+    ax[2].plot(Freq[1:int(N/2)], phi_t[1:int(N/2)])
     ax[2].set_xlabel('Frequency [Hz]', size = 14)
     ax[2].set_ylabel('Time [s]', size = 14)
     ax[2].set_xscale('log')
@@ -92,7 +110,7 @@ def plt_time_data():
     ax[0].plot(Time, out_51)
     ax[0].set_ylabel('Amplitude', size = 14)
 
-    ax[1].plot(Time, t_phase)
+    ax[1].plot(Time, phi_t)
     ax[1].set_ylabel('Phase', size = 14)
     ax[1].set_xscale('log')
 

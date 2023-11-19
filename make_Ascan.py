@@ -10,7 +10,7 @@ Time = data_51[0] + 1 # Time [s]
 Input = data_51[1] # Voltage applied to VCO [V]
 # check index where Input get 2.00 for the first time
 index = np.where(Input >= 2.00)[0][0]
-t_lac = np.where(Input >= 2.00)[0][0] * (1 / len(Input)) # tau_lac [s]
+t_loc = np.where(Input >= 2.00)[0][0] * (1 / len(Input)) # tau_lac [s]
 out_51 = np.array(data_51[2]) # IF output [V]
 
 # FFT
@@ -35,24 +35,27 @@ sweep_rate = 0.9e9 / 1 # [Hz/s]
 
 # make t-phase data
 t_phase = fft.ifft(f_phase)
-t_phase = np.where(t_phase < 0, t_phase + 2 * np.pi, t_phase)
 t_phase = np.real(t_phase)
+t_phase = np.where(f_phase < 0, f_phase + 2 * np.pi, f_phase)
+#plt.plot(Time, t_phase, 'o')
+#plt.show()
 
 # calculate delay time
-#tau = t_phase / (2 * np.pi * sweep_rate * Time) # [s]
-tau = t_phase / (2 * np.pi) \
-    / (sweep_rate * Time - sweep_rate * t_lac + 0.3e9) # [s]
-print(len(tau))
 
+#tau = t_phase / (2 * np.pi * sweep_rate) # [s]
 
-#print(len(tau))
-#print(tau)
-#t_phase = np.real(t_phase)
+# assume tau^2 << 1
+#tau = t_phase / (2 * np.pi) \
+#    / (sweep_rate * Time - sweep_rate * t_lac + 0.3e9) # [s]
 
-#plt.plot(Time, t_phase)
+# consider tqau^2
+term1 = t_phase / sweep_rate / np.pi
+tau =  term1 + np.sqrt( \
+    term1**2 + Time - t_loc + 0.3e9 / sweep_rate)
+
 #plt.plot(t_phase, out_51)
 #plt.plot(tau, t_phase)
-plt.plot(tau, out_51)
+plt.plot(Time, tau, 'o')
 #plt.xscale('log')
 plt.show()
 

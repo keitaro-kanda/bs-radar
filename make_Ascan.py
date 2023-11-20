@@ -10,7 +10,7 @@ plt.rcParams['agg.path.chunksize'] = 10000
 
 
 # Read csv data
-data_name = 'TX5-RX1.csv'
+data_name = 'TX5-RX4.csv'
 data = pd.read_csv(data_name, header=None, skiprows=19)
 Time = data[0] + 1 # Time [s]
 Input = data[1] # Voltage applied to VCO [V]
@@ -39,13 +39,18 @@ phi_f = np.where(phi_f < 0, phi_f + 2 * np.pi, phi_f)
 
 # calculate time
 sweep_rate = 0.9e9 / 1 # [Hz/s]
-tau_f = np.sqrt(phi_f / (2 * np.pi * sweep_rate)) # [s],　← 怪しいことしてる
+#tau_f = np.sqrt(phi_f / (2 * np.pi * sweep_rate)) # [s],　← 怪しいことしてる
 
 
 
 # =====IFFT=====
-tau_t = fft.ifft(tau_f)
-tau_t = np.real(tau_t)
+phi_t = fft.ifft(phi_f)
+#tau_t = fft.ifft(tau_f)
+tau_t = np.real(phi_t)
+tau_t = np.where(phi_f < 0, phi_f + 2 * np.pi, phi_f)
+#plt.plot(Time, tau_t)
+#plt.show()
+tau_t = np.sqrt(phi_t / (2 * np.pi * sweep_rate))
 tau_t = tau_t / Time # [s], ← 怪しいことしてる
 #plt.plot(Time, tau_t, 'o')
 #plt.plot(tau_t, Output)
@@ -61,10 +66,12 @@ Output_sort = Output[np.argsort(tau_t)]
 
 
 # =====save data and plot=====
-# save data
+# make save directory
 save_dir_path = 'Ascan/' + data_name.split('.')[0] + '.csv'
 if not os.path.exists(save_dir_path):
     os.makedirs(save_dir_path)
+
+# save data
 data_save = np.vstack((tau_t_sort, Output_sort))
 data_save = data_save.T
 np.savetxt(save_dir_path + '/tau_t_Output.csv', data_save, delimiter=',')

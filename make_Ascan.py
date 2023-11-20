@@ -1,3 +1,5 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -8,7 +10,8 @@ plt.rcParams['agg.path.chunksize'] = 10000
 
 
 # Read csv data
-data = pd.read_csv('TX5-RX1.csv', header=None, skiprows=19)
+data_name = 'TX5-RX1.csv'
+data = pd.read_csv(data_name, header=None, skiprows=19)
 Time = data[0] + 1 # Time [s]
 Input = data[1] # Voltage applied to VCO [V]
 Output = np.array(data[2]) # IF output [V], np.array()にしないとFFTでエラーが出る（なんで？）
@@ -52,16 +55,35 @@ tau_t = tau_t / Time # [s], ← 怪しいことしてる
 #plt.show()
 
 
-# A-scanできたのか...?
-
-
 # make tau_t vs Output plot
 tau_t_sort = tau_t[np.argsort(tau_t)]
 Output_sort = Output[np.argsort(tau_t)]
+
+
+# =====save data and plot=====
+# save data
+save_dir_path = 'Ascan/' + data_name.split('.')[0] + '.csv'
+if not os.path.exists(save_dir_path):
+    os.makedirs(save_dir_path)
+data_save = np.vstack((tau_t_sort, Output_sort))
+data_save = data_save.T
+np.savetxt(save_dir_path + '/tau_t_Output.csv', data_save, delimiter=',')
+
+# plot
 plt.plot(tau_t_sort, Output_sort)
+
+plt.title(data_name.split('.')[0], size = 16)
+plt.xlabel('Time [s]', size = 14)
+plt.ylabel('Output Voltage [V]', size = 14)
+plt.ylim(0.18, 0.30)
 plt.xscale('log')
 #plt.xlim(0, 1)
+plt.grid()
+plt.savefig(save_dir_path + '/tau_t_Output.png', dpi=300)
 plt.show()
+
+
+print('saved')
 
 
 

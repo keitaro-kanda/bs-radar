@@ -78,8 +78,8 @@ def all_file():
     ax[5].set_ylim(0.17, 0.31)
 
 
-    #fig.supxlabel('Time [s]', size = 14)
-    #fig.supylabel('Voltage [V]', size = 14)
+    fig.supxlabel('Time [s]', size = 14)
+    fig.supylabel('Voltage [V]', size = 14)
 
 
     plt.savefig('tV_plot/all.png', dpi=300)

@@ -10,7 +10,7 @@ plt.rcParams['agg.path.chunksize'] = 10000
 
 
 # Read csv data
-data_name = 'TX5-RX1.csv'
+data_name = 'TX5-RX4.csv'
 data = pd.read_csv(data_name, header=None, skiprows=19)
 Time = data[0] + 1 # Time [s], 0~2に変換
 Input = data[1] # Voltage applied to VCO [V]
@@ -47,17 +47,17 @@ tau_f = np.sqrt(phi_f / (2 * np.pi * sweep_rate)) # [s],　← 怪しいこと�
 # 先にIFFT
 #phi_t = np.real(fft.ifft(phi_f))
 #phi_t = np.where(phi_t < 0, phi_t + 2 * np.pi, phi_t)
-#tau_t = np.sqrt(phi_t / (2 * np.pi * sweep_rate))
+#tau_t = phi_t / (2 * np.pi * sweep_rate)
 #plt.plot(Time, phi_t, 'o')
 #plt.show()
 
 # 先にsweep rateで割る
 tau_t = np.real(fft.ifft(tau_f))
 tau_t = tau_t / Time # [s], ← 怪しいことしてる
-plt.plot(Time, tau_t, 'o')
-plt.yscale('log')
+#plt.plot(Time, tau_t, 'o')
+#plt.yscale('log')
 #plt.xlim(0, 2)
-plt.show()
+#plt.show()
 
 
 # make tau_t vs Output plot

@@ -2,40 +2,50 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.fftpack as fft
+
+# plot数の上限を上げるおまじない（？）
 plt.rcParams['agg.path.chunksize'] = 10000
 
+
 # Read csv data
-data_51 = pd.read_csv('TX5-RX1.csv', header=None, skiprows=19)
-Time = data_51[0] + 1 # Time [s]
-Input = data_51[1] # Voltage applied to VCO [V]
+data = pd.read_csv('TX5-RX1.csv', header=None, skiprows=19)
+Time = data[0] + 1 # Time [s]
+Input = data[1] # Voltage applied to VCO [V]
+Output = np.array(data[2]) # IF output [V], np.array()にしないとFFTでエラーが出る（なんで？）
+
+
 # check index where Input get 2.00 for the first time
 index = np.where(Input >= 2.00)[0][0]
 t_loc = np.where(Input >= 2.00)[0][0] * (1 / len(Input)) # tau_lac [s]
-out_51 = np.array(data_51[2]) # IF output [V]
 
-# FFT
+
+
+# =====FFT=====
+# set parameters
 fs = 16000 # sampling frequency [Hz]
-N = len(out_51) # data size
-#t = np.arange(0, N/fs, 1/fs)
+N = len(Output) # data size
 
-out_fft = fft.fft(out_51)
+# calculate FFT
+out_fft = fft.fft(Output)
 Amp = np.abs(out_fft)
 Freq = fft.fftfreq(N, 1/fs)
 
-# calculate phase and check the time
+# calculate phase
 phi_f = np.angle(out_fft)
 phi_f = np.where(phi_f < 0, phi_f + 2 * np.pi, phi_f)
 
 # calculate time
 sweep_rate = 0.9e9 / 1 # [Hz/s]
-tau_f = np.sqrt(phi_f / (2 * np.pi * sweep_rate)) # [s]　← 怪しいことしてる
-#plt.plot(Freq[1:int(N/2)], phi_f[1:int(N/2)], 'o')
-#plt.show()
+tau_f = np.sqrt(phi_f / (2 * np.pi * sweep_rate)) # [s],　← 怪しいことしてる
 
+
+
+# =====IFFT=====
 tau_t = fft.ifft(tau_f)
 tau_t = np.real(tau_t)
+tau_t = tau_t / Time # [s], ← 怪しいことしてる
 #plt.plot(Time, tau_t, 'o')
-#plt.plot(tau_t, out_51)
+#plt.plot(tau_t, Output)
 #plt.xscale('log')
 #plt.yscale('log')
 #plt.xlim(0, 2)
@@ -43,14 +53,19 @@ tau_t = np.real(tau_t)
 
 
 # A-scanできたのか...?
-# make tau_t vs out_51
+
+
+# make tau_t vs Output plot
 tau_t_sort = tau_t[np.argsort(tau_t)]
-out_51_sort = out_51[np.argsort(tau_t)]
-plt.plot(tau_t_sort, out_51_sort)
-#plt.xscale('log')
-plt.xlim(1e-9, 9e-8)
+Output_sort = Output[np.argsort(tau_t)]
+plt.plot(tau_t_sort, Output_sort)
+plt.xscale('log')
+#plt.xlim(0, 1)
 plt.show()
 
+
+
+# 以下，余計かもしれない
 # make t-phase data
 phi_t = fft.ifft(phi_f)
 phi_t = np.real(phi_t)
@@ -71,7 +86,7 @@ term1 = phi_t / sweep_rate / np.pi
 tau =  term1 + np.sqrt( \
     term1**2 + Time - t_loc + 0.3e9 / sweep_rate)
 
-#plt.plot(phi_t, out_51)
+#plt.plot(phi_t, Output)
 #plt.plot(tau, phi_t)
 #plt.plot(Time, tau, 'o')
 #plt.xscale('log')
@@ -107,7 +122,7 @@ def plt_Freq_data():
 
 def plt_time_data():
     fig, ax = plt.subplots(2, 1, tight_layout=True, figsize=(8, 6), sharex='none')
-    ax[0].plot(Time, out_51)
+    ax[0].plot(Time, Output)
     ax[0].set_ylabel('Amplitude', size = 14)
 
     ax[1].plot(Time, phi_t)

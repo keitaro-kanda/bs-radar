@@ -36,15 +36,15 @@ def one_file(path):
 # Rea and plot all csv data 
 def all_file():
     
-    data_51 = pd.read_csv('TX5-RX1.csv', header=None, skiprows=19)
+    data = pd.read_csv('TX5-RX1.csv', header=None, skiprows=19)
     data_52 = pd.read_csv('TX5-RX2.csv', header=None, skiprows=19)
     data_53 = pd.read_csv('TX5-RX3.csv', header=None, skiprows=19)
     data_54 = pd.read_csv('TX5-RX4.csv', header=None, skiprows=19)
     data_Th = pd.read_csv('Through.csv', header=None, skiprows=19)
 
-    Time = data_51[0] # Time [s]
-    Input_51 = data_51[1] # Voltage applied to VCO [V]
-    Output_51 = data_51[2] # IF output [V]
+    Time = data[0] # Time [s]
+    Input_51 = data[1] # Voltage applied to VCO [V]
+    Output_51 = data[2] # IF output [V]
     Output_52 = data_52[2] # IF output [V]
     Output_53 = data_53[2] # IF output [V]
     Output_54 = data_54[2] # IF output [V]

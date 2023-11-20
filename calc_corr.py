@@ -5,13 +5,13 @@ import pandas as pd
 from tqdm import tqdm
 
 # Read csv data
-data_51 = pd.read_csv('TX5-RX1.csv', header=None, skiprows=19)
+data = pd.read_csv('TX5-RX1.csv', header=None, skiprows=19)
 data_52 = pd.read_csv('TX5-RX2.csv', header=None, skiprows=19)
 data_53 = pd.read_csv('TX5-RX3.csv', header=None, skiprows=19)
 data_54 = pd.read_csv('TX5-RX4.csv', header=None, skiprows=19)
 
 # output data
-out_51 = data_51[2] # IF output [V]
+Output = data[2] # IF output [V]
 out_52 = data_52[2] # IF output [V]
 out_53 = data_53[2] # IF output [V]
 out_54 = data_54[2] # IF output [V]
@@ -41,7 +41,7 @@ for i in tqdm(range(len(V_RMS))):
         delay_time_53 = np.int(np.sqrt(t**2 + (L_53 / v)**2) / delta_t)
         delay_time_54 = np.int(np.sqrt(t**2 + (L_54 / v)**2) / delta_t)
 
-        outvalue_51 = out_51[delay_time_51]
+        outvalue_51 = Output[delay_time_51]
         outvalue_52 = out_52[delay_time_52]
         outvalue_53 = out_53[delay_time_53]
         outvalue_54 = out_54[delay_time_54]

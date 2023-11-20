@@ -10,9 +10,9 @@ plt.rcParams['agg.path.chunksize'] = 10000
 
 
 # Read csv data
-data_name = 'TX5-RX4.csv'
+data_name = 'TX5-RX1.csv'
 data = pd.read_csv(data_name, header=None, skiprows=19)
-Time = data[0] + 1 # Time [s]
+Time = data[0] + 1 # Time [s], 0~2に変換
 Input = data[1] # Voltage applied to VCO [V]
 Output = np.array(data[2]) # IF output [V], np.array()にしないとFFTでエラーが出る（なんで？）
 
@@ -39,25 +39,25 @@ phi_f = np.where(phi_f < 0, phi_f + 2 * np.pi, phi_f)
 
 # calculate time
 sweep_rate = 0.9e9 / 1 # [Hz/s]
-#tau_f = np.sqrt(phi_f / (2 * np.pi * sweep_rate)) # [s],　← 怪しいことしてる
+tau_f = np.sqrt(phi_f / (2 * np.pi * sweep_rate)) # [s],　← 怪しいことしてる
 
 
 
 # =====IFFT=====
-phi_t = fft.ifft(phi_f)
-#tau_t = fft.ifft(tau_f)
-tau_t = np.real(phi_t)
-tau_t = np.where(phi_f < 0, phi_f + 2 * np.pi, phi_f)
-#plt.plot(Time, tau_t)
+# 先にIFFT
+#phi_t = np.real(fft.ifft(phi_f))
+#phi_t = np.where(phi_t < 0, phi_t + 2 * np.pi, phi_t)
+#tau_t = np.sqrt(phi_t / (2 * np.pi * sweep_rate))
+#plt.plot(Time, phi_t, 'o')
 #plt.show()
-tau_t = np.sqrt(phi_t / (2 * np.pi * sweep_rate))
+
+# 先にsweep rateで割る
+tau_t = np.real(fft.ifft(tau_f))
 tau_t = tau_t / Time # [s], ← 怪しいことしてる
-#plt.plot(Time, tau_t, 'o')
-#plt.plot(tau_t, Output)
-#plt.xscale('log')
-#plt.yscale('log')
+plt.plot(Time, tau_t, 'o')
+plt.yscale('log')
 #plt.xlim(0, 2)
-#plt.show()
+plt.show()
 
 
 # make tau_t vs Output plot

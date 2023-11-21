@@ -31,7 +31,7 @@ for i in range(1, 5):
     Amp = np.abs(out_fft) # Amplitude Spectrum, [V]
     Amp_ASD = np.sqrt(Amp**2 / (fs/N)) # Amplitude Spectrum Density, [V/√Hz]
     Amp_norm = Amp_ASD / np.max(Amp_ASD[1:int(N/2)]) # normalize
-    Amp_PSD = 10 * np.log10(Amp_norm) # Powe Spectrum Densitt, [dB/Hz]
+    Amp_PSD = 10 * np.log10(Amp_norm) # Power Spectrum Densitt, [dB/Hz]
 
 
 

@@ -45,3 +45,28 @@ n番目の地下層における電磁波速度：
 $$
 V_n = \sqrt{ \frac{\tau_n V_{RMS, n}^2 - \tau_{n-1} V_{RMS, n-1}^2}{\tau_n - \tau_{n-1}} }
 $$
+
+
+# Estimating $\Delta \tau$
+
+FFTの周波数分解能（周波数軸の間隔）：
+$$
+\Delta f = \frac{f_s}{N} \ [\mathrm{Hz}]
+$$
+ただし，$f_s$はサンプリング周波数，$N$はデータ数．
+
+遅れ時間$\tau$の分解能は，
+$$
+\Delta \tau = \frac{\Delta f}{\dot{\omega}} \ [\mathrm{s}]
+$$
+
+今回の実験の場合
+- $f_s = 16 \ [\mathrm{kHz}]$
+- $N = 32768 \ (=2^{15})$
+- $\dot{\omega} = 0.9 \ [\mathrm{GHz/s}]$
+
+より，
+$$
+\Delta \tau = \frac{16 \times 10^{3} / 2^{15}}{0.9 \times 10^9} \simeq 0.5425 \ [\mathrm{ns}]
+$$
+となる．

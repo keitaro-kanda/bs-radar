@@ -4,57 +4,67 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-# Read csv data
-data_51 = pd.read_csv('Ascan/TX5-RX1.csv/tau_t_Output.csv', header=None, skiprows=19)
-data_52 = pd.read_csv('Ascan/TX5-RX2.csv/tau_t_Output.csv', header=None, skiprows=19)
-data_53 = pd.read_csv('Ascan/TX5-RX3.csv/tau_t_Output.csv', header=None, skiprows=19)
-data_54 = pd.read_csv('Ascan/TX5-RX4.csv/tau_t_Output.csv', header=None, skiprows=19)
 
-# output data
-Amp_51 = list(data_51[1]) # IF output [V]
-Amp_52 = data_52[1] # IF output [V]
-Amp_53 = data_53[1] # IF output [V]
-Amp_54 = data_54[1] # IF output [V]
+# =====Read A-scan data=====
+def read_Ascan(i):
+    file_path = 'Ascan/TX5-RX' + str(i)  + '/tau_ASD_PSD.csv'
+    data = pd.read_csv(file_path, header=None, skiprows=1)
+    delay_time = data[0] # delay time [s]
+    ASD = data[1] # Amplitude Spectrum Density, [V/√Hz]
+    PSD = data[2] # Power Spectrum Densitt, [dB/Hz]
+    return delay_time, ASD, PSD
 
-
-# distance between TX and RX
-L_51 = 0.2 * 4 # [m]
-L_52 = 0.2 * 3 # [m]
-L_53 = 0.2 * 2 # [m]
-L_54 = 0.2 * 1 # [m]
+tau1, Amp_ASD1, Amp_PSD1 = read_Ascan(1) # pandas, series型
+tau2, Amp_ASD2, Amp_PSD2 = read_Ascan(2)
+tau3, Amp_ASD3, Amp_PSD3 = read_Ascan(3)
+tau4, Amp_ASD4, Amp_PSD4 = read_Ascan(4)
 
 
-delta_tau = 0.01e-9 # time resolution [s]
-tau = np.arange(0, 20e-9, delta_tau) # time [s]
-V_RMS = np.arange(0.01, 1.01, 0.01) # list of RMS voltage, generalized in C = 3e8 (speed of light)
+# =====distance between TX and RX=====
+L_1 = 0.2 * 4 # [m]
+L_2 = 0.2 * 3 # [m]
+L_3 = 0.2 * 2 # [m]
+L_4 = 0.2 * 1 # [m]
+
+
+# =====make axis lists=====
+fs = 16000 # sampling frequency [Hz]
+N = 32768 # data size
+sweep_rate = 0.9e9 # [Hz/s]
+delta_tau = fs / N / sweep_rate  # resolution of tau [s]
+max_tau = 20 # [ns]
+tau = np.arange(0, max_tau * 1e-9, delta_tau) # time series [s]
+
+V_RMS = np.arange(0.01, 1.01, 0.01) # RMS velocity series, normalized by c
 
 corr = np.zeros((len(tau), len(V_RMS)))
 
 
 for i in tqdm(range(len(V_RMS))):
-    v = V_RMS[i]* 3e8
+    v = V_RMS[i]* 3e8 #  [m/s]
     for j in range(len(tau)):
-        t = tau[j]
+        t = tau[j] # [s]
         # calculate delay time and convert to index number
-        delay_time_51 = np.sqrt(t**2 + (L_51 / v)**2)
-        delay_time_52 = np.sqrt(t**2 + (L_52 / v)**2)
-        delay_time_53 = np.sqrt(t**2 + (L_53 / v)**2)
-        delay_time_54 = np.sqrt(t**2 + (L_54 / v)**2)
+        delay_time1 = np.sqrt(t**2 + (L_1 / v)**2)
+        delay_time2 = np.sqrt(t**2 + (L_2 / v)**2)
+        delay_time3 = np.sqrt(t**2 + (L_3 / v)**2)
+        delay_time4 = np.sqrt(t**2 + (L_4 / v)**2)
 
-        outvalue_51 = Amp_51.index(delay_time_51)
-        outvalue_52 = Amp_52.index(delay_time_52)
-        outvalue_53 = Amp_53.index(delay_time_53)
-        outvalue_54 = Amp_54.index(delay_time_54)
+        #f1 = Amp_ASD1[int(delay_time1/delta_tau)]
+        f1 = Amp_ASD1.index(delay_time1)
+        f2 = Amp_ASD2[int(delay_time2/delta_tau)]
+        f3 = Amp_ASD3[int(delay_time3/delta_tau)]
+        f4 = Amp_ASD4[int(delay_time4/delta_tau)]
 
-        corr[j, i] = outvalue_51 * outvalue_52 + outvalue_51 * outvalue_53 + outvalue_51 * outvalue_54 \
-            + outvalue_52 * outvalue_53 + outvalue_52 * outvalue_54 \
-            + outvalue_53 * outvalue_54
+        corr[j, i] = f1 * f2 + f1 * f3 + f1 * f4 \
+            + f2 * f3 + f2 * f4 \
+            + f3 * f4
         
         #print(t, v, corr[v, t])
 
 fig, ax = plt.subplots(1, 1, tight_layout=True, figsize=(8, 6))
 plt.imshow(corr,
-            extent=[0, len(V_RMS)*0.01, len(tau)*0.1, 0], 
+            extent=[0, len(V_RMS)*0.01, max_tau, 0], 
             cmap='inferno', aspect='auto')
 
 plt.xlabel('RMS Velocity [/c]')

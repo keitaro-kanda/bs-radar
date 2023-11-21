@@ -12,6 +12,7 @@ def one_file(path):
     data = pd.read_csv(file_path, header=None, skiprows=19)
 
     time = data[0] # Time [s]
+    time = time - min(time) # -1~+1を0~+2に変換
     input = data[1] # Voltage applied to VCO [V]
     output = data[2] # IF output [V]
 
@@ -43,6 +44,7 @@ def all_file():
     data_Th = pd.read_csv('Through.csv', header=None, skiprows=19)
 
     Time = data[0] # Time [s]
+    Time = Time - min(Time) # -1~+1を0~+2に変換
     Input_51 = data[1] # Voltage applied to VCO [V]
     Output_51 = data[2] # IF output [V]
     Output_52 = data_52[2] # IF output [V]

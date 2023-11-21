@@ -70,3 +70,14 @@ $$
 \Delta \tau = \frac{16 \times 10^{3} / 2^{15}}{0.9 \times 10^9} \simeq 0.5425 \ [\mathrm{ns}]
 $$
 となる．
+
+
+# Estimating some representative $\tau$
+
+TX5-RX1の場合
+- 直達：$0.8 / 3 \times 10^8 = 2.666 \dots \ [\mathrm{ns}]$
+- 床からの反射： $ 2 \sqrt{0.8^2 + 0.3^2} / 3 \times 10^8 \simeq 5.696 \ [\mathrm{ns}] $
+
+TX5-RX4の場合
+- 直達：$0.2 / 3 \times 10^8 = 0.666 \dots \ [\mathrm{ns}]$
+- 床からの反射： $ 2 \sqrt{0.2^2 + 0.3^2} / 3 \times 10^8 \simeq 2.404 \ [\mathrm{ns}] $

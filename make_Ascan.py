@@ -9,7 +9,8 @@ import scipy.fftpack as fft
 for i in range(1, 5):
     data_name = 'TX5-RX' + str(i) + '.csv'
     data = pd.read_csv(data_name, header=None, skiprows=19)
-    Time = data[0] + 1 # Time [s], 0~2に変換
+    Time = data[0]  # Time [s]
+    Time = Time - min(Time) # -1~+1を0~+2に変換
     Input = data[1] # Voltage applied to VCO [V]
     Output = np.array(data[2]) # IF output [V], np.array()にしないとFFTでエラーが出る（なんで？）
 

@@ -56,17 +56,18 @@ for i in tqdm(range(len(V_RMS))):
         delay_time4 = np.sqrt(t**2 + (L_4 / v)**2)
 
         
-        f1 = AS1[int(delay_time1/delta_tau)] 
-        f2 = AS2[int(delay_time2/delta_tau)] 
-        f3 = AS3[int(delay_time3/delta_tau)] 
-        f4 = AS4[int(delay_time4/delta_tau)] 
+        f1 = AS1[(delay_time1 - delta_tau/2 < tau1) & (tau1 < delay_time1 + delta_tau/2)].values[0]
+        f2 = AS2[(delay_time2 - delta_tau/2 < tau2) & (tau2 < delay_time2 + delta_tau/2)].values[0]
+        f3 = AS3[(delay_time3 - delta_tau/2 < tau3) & (tau3 < delay_time3 + delta_tau/2)].values[0]
+        f4 = AS4[(delay_time4 - delta_tau/2 < tau4) & (tau4 < delay_time4 + delta_tau/2)].values[0]
+        #print(type(f1), type(f2), type(f3), type(f4))
+        #print(f1, f2, f3, f4)
 
 
         corr[j, i] = f1 * f2 + f1 * f3 + f1 * f4 \
             + f2 * f3 + f2 * f4 \
             + f3 * f4
-        
-        #print(t, v, corr[v, t])
+np.savetxt('corr/corr.txt', corr, delimiter=',', fmt='%s')
 
 fig, ax = plt.subplots(1, 1, tight_layout=True, figsize=(8, 6))
 plt.imshow(corr,
@@ -82,5 +83,5 @@ delvider = axgrid1.make_axes_locatable(ax)
 cax = delvider.append_axes('right', size='5%', pad=0.1)
 plt.colorbar(cax=cax, label = 'correration')
 
-
+plt.savefig('corr/corr.png', dpi=300)
 plt.show()

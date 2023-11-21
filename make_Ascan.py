@@ -30,8 +30,29 @@ N = len(Output) # data size
 
 # calculate FFT
 out_fft = fft.fft(Output)
-Amp = np.abs(out_fft)
+Amp = np.abs(out_fft) 
+Amp = 10 * np.log10(np.sqrt(Amp**2 / (fs/N))) # PSD, [dB/Hz]
 Freq = fft.fftfreq(N, 1/fs)
+#plt.plot(Freq[1:int(N/2)], Amp[1:int(N/2)])
+#plt.xscale('log')
+#plt.show()
+
+
+# calculate tau
+sweep_rate = 0.9e9 / 1 # [Hz/s]
+tau = Freq / sweep_rate # [s]
+print(tau)
+
+plt.plot(tau[1:int(N/2)], Amp[1:int(N/2)])
+#plt.plot(tau, Amp)
+#plt.xlim(0, 5e-8)
+plt.xscale('log')
+plt.grid()
+plt.show()
+
+
+
+
 
 # calculate phase
 phi_f = np.angle(out_fft)
@@ -77,17 +98,17 @@ data_save = data_save.T
 np.savetxt(save_dir_path + '/tau_t_Output.csv', data_save, delimiter=',')
 
 # plot
-plt.plot(tau_t_sort, Output_sort)
+#plt.plot(tau_t_sort, Output_sort)
 
-plt.title(data_name.split('.')[0], size = 16)
-plt.xlabel('Time [s]', size = 14)
-plt.ylabel('Output Voltage [V]', size = 14)
-plt.ylim(0.18, 0.30)
-plt.xscale('log')
+#plt.title(data_name.split('.')[0], size = 16)
+#plt.xlabel('Time [s]', size = 14)
+#plt.ylabel('Output Voltage [V]', size = 14)
+#plt.ylim(0.18, 0.30)
+#plt.xscale('log')
 #plt.xlim(0, 1)
-plt.grid()
-plt.savefig(save_dir_path + '/tau_t_Output.png', dpi=300)
-plt.show()
+#plt.grid()
+#plt.savefig(save_dir_path + '/tau_t_Output.png', dpi=300)
+#plt.show()
 
 
 print('saved')

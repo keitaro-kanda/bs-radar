@@ -27,9 +27,11 @@ for i in range(1, 5):
 
     # calculate FFT
     out_fft = fft.fft(Output)
-    Amp = np.abs(out_fft) 
-    Amp = 10 * np.log10(np.sqrt(Amp**2 / (fs/N))) # PSD, [dB/Hz]
     Freq = fft.fftfreq(N, 1/fs)
+    Amp = np.abs(out_fft) # Amplitude Spectrum, [V]
+    Amp_ASD = np.sqrt(Amp**2 / (fs/N)) # Amplitude Spectrum Density, [V/√Hz]
+    Amp_norm = Amp_ASD / np.max(Amp_ASD[1:int(N/2)]) # normalize
+    Amp_PSD = 10 * np.log10(Amp_norm) # Powe Spectrum Densitt, [dB/Hz]
 
 
 
@@ -40,17 +42,20 @@ for i in range(1, 5):
     tau = Freq / sweep_rate # delay time [s]
 
 
-    # save data
-    data = np.vstack((tau, Amp))
+    # save data as csv
+    data = np.vstack((tau, Amp_ASD, Amp_PSD))
     data = data.T
+    # add header
+    header = ['tau [s]', 'ASD [V/√Hz]', 'PSD [dB/Hz]']
+    data = np.vstack((header, data))
 
     out_dir = 'Ascan/' + data_name.split('.')[0]
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
-    np.savetxt(out_dir + '/tau_PSD.csv', data, delimiter=',')
+    np.savetxt(out_dir + '/tau_ASD_PSD.csv', data, delimiter=',', fmt='%s')
 
     # plot
-    plt.plot(tau[1:int(N/2)], Amp[1:int(N/2)])
+    plt.plot(tau[1:int(N/2)], Amp_PSD[1:int(N/2)])
 
     plt.title(data_name.split('.')[0], size = 16)
     plt.xlabel('Delay Time [s]', size = 14)

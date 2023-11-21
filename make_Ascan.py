@@ -43,10 +43,10 @@ for i in range(1, 5):
 
 
     # save data as csv
-    data = np.vstack((tau, Amp_ASD, Amp_PSD))
+    data = np.vstack((tau, Amp, Amp_ASD, Amp_PSD))
     data = data.T
     # add header
-    header = ['tau [s]', 'ASD [V/√Hz]', 'PSD [dB/Hz]']
+    header = ['tau [s]', 'AS [V]', 'ASD [V/√Hz]', 'PSD [dB/Hz]']
     data = np.vstack((header, data))
 
     out_dir = 'Ascan/' + data_name.split('.')[0]

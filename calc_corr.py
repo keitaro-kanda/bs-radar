@@ -10,14 +10,15 @@ def read_Ascan(i):
     file_path = 'Ascan/TX5-RX' + str(i)  + '/tau_ASD_PSD.csv'
     data = pd.read_csv(file_path, header=None, skiprows=1)
     delay_time = data[0] # delay time [s]
-    ASD = data[1] # Amplitude Spectrum Density, [V/√Hz]
-    PSD = data[2] # Power Spectrum Densitt, [dB/Hz]
-    return delay_time, ASD, PSD
+    AS = data[1] # Amplitude Spectrum, [V]
+    ASD = data[2] # Amplitude Spectrum Density, [V/√Hz]
+    PSD = data[3] # Power Spectrum Densitt, [dB/Hz]
+    return delay_time, AS, ASD, PSD
 
-tau1, Amp_ASD1, Amp_PSD1 = read_Ascan(1) # pandas, series型
-tau2, Amp_ASD2, Amp_PSD2 = read_Ascan(2)
-tau3, Amp_ASD3, Amp_PSD3 = read_Ascan(3)
-tau4, Amp_ASD4, Amp_PSD4 = read_Ascan(4)
+tau1, AS1, ASD1, PSD1 = read_Ascan(1) # pandas, series型
+tau2, AS2, ASD2, PSD2 = read_Ascan(2)
+tau3, AS3, ASD3, PSD3 = read_Ascan(3)
+tau4, AS4, ASD4, PSD4 = read_Ascan(4)
 
 
 # =====distance between TX and RX=====
@@ -27,13 +28,17 @@ L_3 = 0.2 * 2 # [m]
 L_4 = 0.2 * 1 # [m]
 
 
-# =====make axis lists=====
+# =====caluculate delta tau=====
 fs = 16000 # sampling frequency [Hz]
 N = 32768 # data size
 sweep_rate = 0.9e9 # [Hz/s]
 delta_tau = fs / N / sweep_rate  # resolution of tau [s]
+
+
+# =====make axis lists=====
 max_tau = 20 # [ns]
-tau = np.arange(0, max_tau * 1e-9, delta_tau) # time series [s]
+delta_t = 0.1 # [ns]
+tau = np.arange(0, max_tau * 1e-9, delta_t * 1e-9) # time series [s]
 
 V_RMS = np.arange(0.01, 1.01, 0.01) # RMS velocity series, normalized by c
 
@@ -50,11 +55,12 @@ for i in tqdm(range(len(V_RMS))):
         delay_time3 = np.sqrt(t**2 + (L_3 / v)**2)
         delay_time4 = np.sqrt(t**2 + (L_4 / v)**2)
 
-        #f1 = Amp_ASD1[int(delay_time1/delta_tau)]
-        f1 = Amp_ASD1.index(delay_time1)
-        f2 = Amp_ASD2[int(delay_time2/delta_tau)]
-        f3 = Amp_ASD3[int(delay_time3/delta_tau)]
-        f4 = Amp_ASD4[int(delay_time4/delta_tau)]
+        
+        f1 = AS1[int(delay_time1/delta_tau)] 
+        f2 = AS2[int(delay_time2/delta_tau)] 
+        f3 = AS3[int(delay_time3/delta_tau)] 
+        f4 = AS4[int(delay_time4/delta_tau)] 
+
 
         corr[j, i] = f1 * f2 + f1 * f3 + f1 * f4 \
             + f2 * f3 + f2 * f4 \

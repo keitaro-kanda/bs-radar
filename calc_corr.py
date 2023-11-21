@@ -10,7 +10,7 @@ def read_Ascan(i):
     file_path = 'Ascan/TX5-RX' + str(i)  + '/tau_ASD_PSD.csv'
     data = pd.read_csv(file_path, header=None, skiprows=1)
     delay_time = data[0] # delay time [s]
-    AS = data[1] # Amplitude Spectrum, [V]
+    AS = data[1]  # Amplitude Spectrum, [V]
     ASD = data[2] # Amplitude Spectrum Density, [V/√Hz]
     PSD = data[3] # Power Spectrum Densitt, [dB/Hz]
     return delay_time, AS, ASD, PSD

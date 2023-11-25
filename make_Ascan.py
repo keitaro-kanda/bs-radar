@@ -6,8 +6,11 @@ import pandas as pd
 import scipy.fftpack as fft
 
 # Read csv data
-for i in range(1, 5):
-    data_name = 'TX5-RX' + str(i) + '.csv'
+for i in range(1, 6):
+    if i == 5:
+        data_name = 'Through.csv'
+    else:
+        data_name = 'TX5-RX' + str(i) + '.csv'
     data = pd.read_csv(data_name, header=None, skiprows=19)
     Time = data[0]  # Time [s]
     Time = Time - min(Time) # -1~+1を0~+2に変換

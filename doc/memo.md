@@ -2,15 +2,20 @@
 
 $$
 \begin{split}
-\phi &= \phi_{LO} - \phi_{RX} \\
+\phi (t) &= \phi_{LO} - \phi_{RX} \\
 &= 2\pi \int_{\tau_{LO}}^{t} (\omega_0 + \dot{\omega}(t' - \tau_{LO}))dt' + 2\pi \int_{\tau_{RX}}^{t} (\omega_0 + \dot{\omega}(t' - \tau_{RX}))dt' \\
 &= 2\pi \{ \omega_0(t - \tau_{LO}) + \frac{1}{2} \dot{\omega}(t - \tau_{LO})^2 \} - 2\pi \{ \omega_0(t - \tau_{RX}) + \frac{1}{2} \dot{\omega}(t - \tau_{RX})^2 \} \\
 &= 2\pi \{ \omega_0(\tau_{RX} - \tau_{LO}) + \frac{1}{2}\dot{\omega} \{(t^2 - 2t\tau_{LO} + \tau_{LO}^2) - (t^2 - 2t\tau_{RX} + \tau_{RX}^2)\} \} \\
 &= 2\pi \{ \omega_0(\tau_{RX} - \tau_{LO}) + \frac{1}{2}\dot{\omega} \{2t(\tau_{RX} - \tau_{LO}) + \tau_{LO}^2 - \tau_{RX}^2 \} \}\\
-&= 2\pi \{ \omega_0(\tau_{RX} - \tau_{LO}) + \frac{1}{2}\dot{\omega} \{2t(\tau_{RX} - \tau_{LO}) - (\tau_{RX} + \tau_{LO}) (\tau_{RX} - \tau_{LO}) \} \}
+&= 2\pi \{ \omega_0(\tau_{RX} - \tau_{LO}) + \frac{1}{2}\dot{\omega} \{2t(\tau_{RX} - \tau_{LO}) - (\tau_{RX} + \tau_{LO}) (\tau_{RX} - \tau_{LO}) \} \} \\
+&= 2\pi \dot{\omega}(\tau_{RX} - \tau_{LO})t + 2\pi\{ \omega_0 (\tau_{RX} - \tau_{LO}) - \frac{1}{2} \dot{\omega} (\tau_{RX} + \tau_{LO}) (\tau_{RX} - \tau_{LO})\} \\
+&= 2\pi \dot{\omega}(\tau_{RX} - \tau_{LO})t + \Delta \phi_0
 \end{split}
 $$
+$\Delta \phi_0$は時刻$t$に無関係の項．つまり，周波数は$\dot{\omega}(\tau_{RX} - \tau_{LO})$として表せる．
 
+
+#### あんまり関係なかったかも↓
 $\tau = \tau_{RX} - \tau_{LO}$として，
 
 $$

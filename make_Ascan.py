@@ -5,9 +5,7 @@ import numpy as np
 import pandas as pd
 import scipy.fftpack as fft
 
-
-
-def make_Ascan(i):
+for i in range(5):
     # Read csv data
     if i == 0:
         data_name = 'Through.csv'
@@ -61,47 +59,53 @@ def make_Ascan(i):
         os.makedirs(out_dir)
     np.savetxt(out_dir + '/tau_ASD_PSD.csv', data, delimiter=',', fmt='%s')
 
-    """
-    # plot
-    plt.plot(tau[1:int(N/2)], Amp_PSD[1:int(N/2)])
 
-    plt.title(data_name.split('.')[0], size = 16)
+    # =====plot=====
+    fig, ax = plt.subplots(3, 1, sharex='all', tight_layout=True, figsize=(10, 10))
+
+    ax[0].plot(tau[1:int(N/2)], Amp[1:int(N/2)])
+    ax[0].set_ylabel('Amplitude [V]', size = 14)
+    ax[0].grid()
+
+    ax[1].plot(tau[1:int(N/2)], Amp_PSD[1:int(N/2)])
+    ax[1].set_ylabel('Power [dB]', size = 14)
+    ax[1].grid()
+
+    ax[2].plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
+    ax[2].set_ylabel('Normalized Power [dB]', size = 14)
+    ax[2].grid()
+
+    fig.suptitle(data_name.split('.')[0], size = 16)
+    fig.supxlabel('Delay Time [s]', size = 14)
+    plt.xlim(0, 100e-9)
+
+    plt.savefig(out_dir + '/tau_ASD_PSD.png', dpi=300)
+    plt.show()
+
+
+"""
+def Ascan_plot_1sheet():
+    N = len(tau1) # data size
+    # =====plot=====
+    plt.figure(figsize=(10, 10))
+    plt.plot(tau1[1:int(N/2)], Amp_PSD1[1: int(N/2)]-50, label='TX5-RX1')
+    plt.plot(tau2[1:int(N/2)], Amp_PSD2[1: int(N/2)]-100, label='TX5-RX2')
+    plt.plot(tau3[1:int(N/2)], Amp_PSD3[1: int(N/2)]-150, label='TX5-RX3')
+    plt.plot(tau4[1:int(N/2)], Amp_PSD4[1: int(N/2)]-200, label='TX5-RX4')
+    plt.plot(tau0[1:int(N/2)], Amp_PSD0[1: int(N/2)], label='Through')
+
     plt.xlabel('Delay Time [s]', size = 14)
     plt.ylabel('PSD [dB/Hz]', size = 14)
-    #plt.xscale('log')
     plt.xlim(0, 100e-9)
+    plt.ylim(-250, 50)
     plt.grid()
-
-    plt.savefig(out_dir + '/tau_PSD.png', dpi=300)
+    plt.legend(fontsize=8)
+    plt.savefig('Ascan/Ascan_all', dpi=300)
     plt.show()
-    """
 
-    return tau, Amp, Amp_PSD, Amp_PSD_norm, out_dir
+    return plt
+"""
 
-tau1, Amp1, Amp_PSD1, Amp_PSD_norm1, out_dir1 = make_Ascan(1)
-tau2, Amp2, Amp_PSD2, Amp_PSD_norm2, out_dir2 = make_Ascan(2)
-tau3, Amp3, Amp_PSD3, Amp_PSD_norm3, out_dir3 = make_Ascan(3)
-tau4, Amp4, Amp_PSD4, Amp_PSD_norm4, out_dir4 = make_Ascan(4)
-tau0, Amp0, Amp_PSD0, Amp_PSD_norm0, out_dir0 = make_Ascan(0)
-
-
-N = len(tau1) # data size
-# =====plot=====
-plt.figure(figsize=(10, 10))
-plt.plot(tau1[1:int(N/2)], Amp_PSD1[1: int(N/2)]-50, label='TX5-RX1')
-plt.plot(tau2[1:int(N/2)], Amp_PSD2[1: int(N/2)]-100, label='TX5-RX2')
-plt.plot(tau3[1:int(N/2)], Amp_PSD3[1: int(N/2)]-150, label='TX5-RX3')
-plt.plot(tau4[1:int(N/2)], Amp_PSD4[1: int(N/2)]-200, label='TX5-RX4')
-plt.plot(tau0[1:int(N/2)], Amp_PSD0[1: int(N/2)], label='Through')
-
-plt.xlabel('Delay Time [s]', size = 14)
-plt.ylabel('PSD [dB/Hz]', size = 14)
-plt.xlim(0, 100e-9)
-plt.ylim(-250, 50)
-plt.grid()
-plt.legend(fontsize=8)
-plt.savefig('Ascan/Ascan_all', dpi=300)
-plt.show()
 
 
 

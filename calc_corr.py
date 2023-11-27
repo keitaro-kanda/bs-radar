@@ -12,7 +12,8 @@ def read_Ascan(i):
     delay_time = data[0] # delay time [s]
     AS = data[1]  # Amplitude Spectrum, [V]
     ASD = data[2] # Amplitude Spectrum Density, [V/√Hz]
-    PSD = data[3] # Power Spectrum Densitt, [dB/Hz]
+    PSD = data[3] # Power Spectrum Density, [dB/Hz]
+    delay_time = delay_time - delay_time[np.argmax(PSD)] # tau_0をt=0にする
     return delay_time, AS, ASD, PSD
 
 tau1, AS1, ASD1, PSD1 = read_Ascan(1) # pandas, series型
@@ -75,7 +76,7 @@ plt.imshow(corr,
             cmap='inferno', aspect='auto')
 
 plt.xlabel('RMS Velocity [/c]')
-plt.ylabel('tau [ns]')
+plt.ylabel('tau (2-way travel time) [ns]')
 plt.title('Correlation')
 
 # set clorbar

@@ -1,9 +1,19 @@
+import argparse
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.fftpack as fft
+
+# ======load files=====
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='Calculate delay time and plot A-scan.', 
+                                 usage='cd bs-radar; python make_Ascan.py plot_type')
+parser.add_argument('plot_type', choices=['3panels', 'single'], help='plot type')
+args = parser.parse_args()
+
+
 
 for i in range(5):
     # Read csv data
@@ -84,14 +94,16 @@ for i in range(5):
         plt.show()
 
         return plt
-    plot_3panel()
+
 
     def plt_PSD():
+        plt.figure(figsize=(10, 4))
         plt.plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
         plt.title(data_name.split('.')[0], size = 16)
         plt.xlabel('Delay Time [s]', size = 14)
         plt.ylabel('PSD [dB/Hz]', size = 14)
         plt.xlim(0, 100e-9)
+        plt.ylim(-35, 0)
         #plt.xscale('log')
         plt.grid()
 
@@ -99,7 +111,11 @@ for i in range(5):
         plt.show()
 
         return plt
-    #plt_PSD()
+    
+    if args.plot_type == '3panels':
+        plot_3panel()
+    elif args.plot_type == 'single':
+        plt_PSD()
 
 
 """

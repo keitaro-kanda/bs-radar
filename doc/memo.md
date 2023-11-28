@@ -81,16 +81,16 @@ $$
 
 TX5-RX1の場合
 - 直達：$0.8 / 3 \times 10^8 = 2.666 \dots \ [\mathrm{ns}]$
-- 床からの反射： $ 2 \sqrt{0.8^2 + 0.3^2} / 3 \times 10^8 \simeq 5.696 \ [\mathrm{ns}] $
+- 床からの反射： $ 2 \sqrt{0.4^2 + 0.3^2} / (3 \times 10^8 / \sqrt{2}) \simeq 4.714 \ [\mathrm{ns}] $
 
 TX5-RX2の場合
 - 直達：$0.6 / 3 \times 10^8 = 2 \dots \ [\mathrm{ns}]$
-- 床からの反射： $ 2 \sqrt{0.6^2 + 0.3^2} / 3 \times 10^8 \simeq 4.472 \ [\mathrm{ns}] $
+- 床からの反射： $ 2 \sqrt{0.3^2 + 0.3^2} / (3 \times 10^8 / \sqrt{2}) = 4 \ [\mathrm{ns}] $
 
 TX5-RX3の場合
 - 直達：$0.4 / 3 \times 10^8 = 1.333 \dots \ [\mathrm{ns}]$
-- 床からの反射： $ 2 \sqrt{0.4^2 + 0.3^2} / 3 \times 10^8 \simeq 3.333 \ [\mathrm{ns}] $
+- 床からの反射： $ 2 \sqrt{0.2^2 + 0.3^2} / (3 \times 10^8 / \sqrt{2}) \simeq 3.399 \ [\mathrm{ns}] $
 
 TX5-RX4の場合
 - 直達：$0.2 / 3 \times 10^8 = 0.666 \dots \ [\mathrm{ns}]$
-- 床からの反射： $ 2 \sqrt{0.2^2 + 0.3^2} / 3 \times 10^8 \simeq 2.404 \ [\mathrm{ns}] $
+- 床からの反射： $ 2 \sqrt{0.1^2 + 0.3^2} / (3 \times 10^8 / \sqrt{2}) \simeq 2.981 \ [\mathrm{ns}] $

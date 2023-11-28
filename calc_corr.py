@@ -51,10 +51,10 @@ for i in tqdm(range(len(V_RMS))):
     for j in range(len(tau)):
         t = tau[j] # [s]
         # calculate delay time and convert to index number
-        delay_time1 = np.sqrt(t**2 + (L_1 / v)**2)
-        delay_time2 = np.sqrt(t**2 + (L_2 / v)**2)
-        delay_time3 = np.sqrt(t**2 + (L_3 / v)**2)
-        delay_time4 = np.sqrt(t**2 + (L_4 / v)**2)
+        delay_time1 = np.sqrt(t**2 + (L_1 / v)**2) + 44.48e-9
+        delay_time2 = np.sqrt(t**2 + (L_2 / v)**2) + 44.48e-9
+        delay_time3 = np.sqrt(t**2 + (L_3 / v)**2) + 44.48e-9
+        delay_time4 = np.sqrt(t**2 + (L_4 / v)**2) + 44.48e-9
 
         
         f1 = AS1[(delay_time1 - delta_tau/2 < tau1) & (tau1 < delay_time1 + delta_tau/2)].values[0]

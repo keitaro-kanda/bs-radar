@@ -61,26 +61,45 @@ for i in range(5):
 
 
     # =====plot=====
-    fig, ax = plt.subplots(3, 1, sharex='all', tight_layout=True, figsize=(10, 10))
+    def plot_3panel():
+        fig, ax = plt.subplots(3, 1, sharex='all', tight_layout=True, figsize=(10, 10))
 
-    ax[0].plot(tau[1:int(N/2)], Amp[1:int(N/2)])
-    ax[0].set_ylabel('Amplitude [V]', size = 14)
-    ax[0].grid()
+        ax[0].plot(tau[1:int(N/2)], Amp[1:int(N/2)])
+        ax[0].set_ylabel('Amplitude [V]', size = 14)
+        ax[0].grid()
 
-    ax[1].plot(tau[1:int(N/2)], Amp_PSD[1:int(N/2)])
-    ax[1].set_ylabel('Power [dB]', size = 14)
-    ax[1].grid()
+        ax[1].plot(tau[1:int(N/2)], Amp_PSD[1:int(N/2)])
+        ax[1].set_ylabel('Power [dB]', size = 14)
+        ax[1].grid()
 
-    ax[2].plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
-    ax[2].set_ylabel('Normalized Power [dB]', size = 14)
-    ax[2].grid()
+        ax[2].plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
+        ax[2].set_ylabel('Normalized Power [dB]', size = 14)
+        ax[2].grid()
 
-    fig.suptitle(data_name.split('.')[0], size = 16)
-    fig.supxlabel('Delay Time [s]', size = 14)
-    plt.xlim(0, 100e-9)
+        fig.suptitle(data_name.split('.')[0], size = 16)
+        fig.supxlabel('Delay Time [s]', size = 14)
+        plt.xlim(0, 100e-9)
 
-    plt.savefig(out_dir + '/tau_ASD_PSD.png', dpi=300)
-    plt.show()
+        plt.savefig(out_dir + '/tau_ASD_PSD.png', dpi=300)
+        plt.show()
+
+        return plt
+    plot_3panel()
+
+    def plt_PSD():
+        plt.plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
+        plt.title(data_name.split('.')[0], size = 16)
+        plt.xlabel('Delay Time [s]', size = 14)
+        plt.ylabel('PSD [dB/Hz]', size = 14)
+        plt.xlim(0, 100e-9)
+        #plt.xscale('log')
+        plt.grid()
+
+        plt.savefig(out_dir + '/tau_PSD.png', dpi=300)
+        plt.show()
+
+        return plt
+    #plt_PSD()
 
 
 """

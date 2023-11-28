@@ -1,5 +1,6 @@
 import argparse
 import os
+from pyclbr import Class
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,11 +11,151 @@ import scipy.fftpack as fft
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Calculate delay time and plot A-scan.', 
                                  usage='cd bs-radar; python make_Ascan.py plot_type')
-parser.add_argument('plot_type', choices=['3panels', '4panels', 'single'], help='plot type')
+parser.add_argument('plot_type', choices=['Ascan_raw', 'Ascan_travel'], help='plot type')
 args = parser.parse_args()
 
 
 
+class make_Ascan:
+    def __init__(self):
+        self.data_name = ''
+        #self.data = None
+        #self.Time = None
+        #self.Input = None
+        #self.Output = None
+    
+    def calc_tau(self):
+        self.data = pd.read_csv(self.data_name, header=None, skiprows=19)
+        self.Time = self.data[0]
+        self.Input = self.data[1]
+        self.Output = self.data[2]
+
+
+        # =====FFT=====
+        # set parameters
+        fs = 16000
+        N = len(self.Output)
+
+        # calculate FFT
+        out_fft = fft.fft(self.Output.values) # .valuesをつけるとSeries型からndarray型に変換できる
+        self.Freq = fft.fftfreq(N, 1/fs) # [Hz]
+        self.Amp = np.abs(out_fft) # Amplitude Spectrum, [V]
+        self.Amp_ASD = np.sqrt(self.Amp**2 / (fs/N)) # Amplitude Spectrum Density, [V/√Hz]
+        self.Amp_PSD = 10 * np.log10(self.Amp_ASD) # Amplitude Spectrum Density, [dB/Hz]
+        self.Amp_norm = self.Amp_ASD / np.max(self.Amp_ASD[1:int(N/2)]) # normalize
+        self.Amp_PSD_norm = 10 * np.log10(self.Amp_norm) # Power Spectrum Density normalized, [dB/Hz]
+
+
+        # =====calculate tau=====
+        freq_start = 0.3e9
+        freq_end = 1.2e9
+        sweep_rate = (freq_end - freq_start) / 1
+        self.tau = self.Freq / sweep_rate # delay time not consider delay in cable [s]
+
+        # consider delay in cable
+        cable_delay = 4.448784722222222e-08 # delay time while signal travels through cable [s]
+        self.tau_travel = self.tau - cable_delay
+        self.tau_travel_0index = np.where(self.tau_travel >= 0)[0][0]
+
+        self.tau_travel = self.tau_travel[self.tau_travel_0index:int(N/2)] # cut off tau_travel before 0
+        self.Amp_travel = self.Amp[self.tau_travel_0index:int(N/2)] # Amplitude Spectrum Density, [V/√Hz]
+        self.Amp_ASD_travel = self.Amp_ASD[self.tau_travel_0index:int(N/2)] # Amplitude Spectrum Density, [V/√Hz]
+        self.Amp_PSD_travel = 10 * np.log10(self.Amp_ASD_travel) # Amplitude Spectrum Density, [dB/Hz]
+        self.Amp_norm_travel = self.Amp_ASD_travel / np.max(self.Amp_ASD_travel) # normalize
+        self.Amp_PSD_norm_travel = 10 * np.log10(self.Amp_norm_travel) # Power Spectrum Density normalized, [dB/Hz]
+
+
+RX1 = make_Ascan()
+RX1.data_name = 'TX5-RX1.csv'
+RX1.calc_tau()
+
+RX2 = make_Ascan()
+RX2.data_name = 'TX5-RX2.csv'
+RX2.calc_tau()
+
+RX3 = make_Ascan()
+RX3.data_name = 'TX5-RX3.csv'
+RX3.calc_tau()
+
+RX4 = make_Ascan()
+RX4.data_name = 'TX5-RX4.csv'
+RX4.calc_tau()
+
+Through = make_Ascan()
+Through.data_name = 'Through.csv'
+Through.calc_tau()
+
+
+# =====save data as csv=====
+def save_data(RX):
+    data = np.vstack((RX.tau_travel, RX.Amp_travel, RX.Amp_PSD_norm_travel))
+    data = data.T
+    # add header
+    header = ['2way travel time [s]', 'AS [V]', 'PSD [dB/Hz]']
+    data = np.vstack((header, data))
+
+    out_dir = 'Ascan/' + RX.data_name.split('.')[0]
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    np.savetxt(out_dir + '/Ascan_data_travel.csv', data, delimiter=',', fmt='%s')
+
+save_data(RX1)
+save_data(RX2)
+save_data(RX3)
+save_data(RX4)
+save_data(Through)
+
+# =====plot=====
+def plot_Ascan():
+    fig, ax = plt.subplots(5, 1, sharex='all', sharey='all', tight_layout=True, figsize=(10, 10))
+
+    RXs = [RX1, RX2, RX3, RX4, Through]
+    titles = ['TX5-RX1', 'TX5-RX2', 'TX5-RX3', 'TX5-RX4', 'Through']
+
+    for i, (RX, title) in enumerate(zip(RXs, titles)):
+        ax[i].plot(RX.tau[1:int(len(RX.tau)/2)], RX.Amp[1:int(len(RX.Amp)/2)])
+        ax[i].set_title(title, size=16)
+        ax[i].grid()
+
+    fig.supxlabel('Delay Time [s]', size = 14)
+    fig.supylabel('Amplitude [V]', size = 14)
+    plt.xlim(4.2e-8, 5.2e-8)
+    plt.ylim(0, 45)
+    #plt.xscale('log')
+
+    plt.savefig('Ascan/Ascan_raw.png', dpi=300)
+    plt.show()
+    return plt
+
+
+def plot_Ascan_travel():
+    fig, ax = plt.subplots(5, 1, sharex='all', sharey='all', tight_layout=True, figsize=(10, 10))
+
+    RXs = [RX1, RX2, RX3, RX4, Through]
+    titles = ['TX5-RX1', 'TX5-RX2', 'TX5-RX3', 'TX5-RX4', 'Through']
+
+    for i, (RX, title) in enumerate(zip(RXs, titles)):
+        ax[i].plot(RX.tau_travel, RX.Amp_travel)
+        ax[i].set_title(title, size=16)
+        ax[i].grid()
+
+    fig.supxlabel('Delay Time [s]', size = 14)
+    fig.supylabel('Amplitude [V]', size = 14)
+    plt.xlim(0, 100e-9)
+    plt.ylim(0, 45)
+    #plt.xscale('log')
+
+    plt.savefig('Ascan/Ascan_travel.png', dpi=300)
+    plt.show()
+    return plt
+
+if args.plot_type == 'Ascan_raw':
+    plot_Ascan()
+elif args.plot_type == 'Ascan_travel':
+    plot_Ascan_travel()
+
+"""
+# 以下，元のコード
 for i in range(5):
     # Read csv data
     if i == 0:
@@ -161,7 +302,7 @@ for i in range(5):
         plot_4panel()
     elif args.plot_type == 'single':
         plt_PSD()
-
+"""
 
 """
 def Ascan_plot_1sheet():

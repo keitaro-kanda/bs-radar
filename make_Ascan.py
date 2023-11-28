@@ -1,6 +1,5 @@
 import argparse
 import os
-from pyclbr import Class
 
 import matplotlib.pyplot as plt
 import numpy as np

@@ -10,7 +10,7 @@ import scipy.fftpack as fft
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Calculate delay time and plot A-scan.', 
                                  usage='cd bs-radar; python make_Ascan.py plot_type')
-parser.add_argument('plot_type', choices=['3panels', 'single'], help='plot type')
+parser.add_argument('plot_type', choices=['3panels', '4panels', 'single'], help='plot type')
 args = parser.parse_args()
 
 
@@ -22,6 +22,7 @@ for i in range(5):
     else:
         data_name = 'TX5-RX' + str(i) + '.csv'
     data = pd.read_csv(data_name, header=None, skiprows=19)
+    
     Time = data[0]  # Time [s]
     #Time = Time - min(Time) # -1~+1を0~+2に変換
     Input = data[1] # Voltage applied to VCO [V]
@@ -54,7 +55,19 @@ for i in range(5):
     freq_start = 0.3e9 # [Hz]
     freq_end = 1.2e9 # [Hz]
     sweep_rate = (freq_end - freq_start) / 1 # [Hz/s]
-    tau = Freq / sweep_rate # delay time [s]
+    tau = Freq / sweep_rate # delay time not consider delay in cable [s]
+
+    cable_delay = 4.448784722222222e-08 # delay time while signal travels through cable [s]
+    tau_travel = tau - cable_delay # delay time consider delay in cable [s]
+
+    tau_travel_0index = np.where(tau_travel >= 0)[0][0] # index where tau_travel get 0 for the first time
+    print('tau_travel_0index =', tau_travel_0index)
+    tau_travel = tau_travel[tau_travel_0index:int(N/2)] # cut off tau_travel before 0
+    Amp_travel = Amp[tau_travel_0index:int(N/2)] # cut off Amp before 0
+    Amp_ASD_travel = Amp_ASD[tau_travel_0index:int(N/2)] # cut off Amp_ASD before 0
+    Amp_PSD_travel = 10 * np.log10(Amp_ASD_travel) # Amplitude Spectrum Density, [dB/Hz]
+    Amp_norm_travel = Amp_ASD_travel / np.max(Amp_ASD_travel) # normalize
+    Amp_PSD_norm_travel = 10 * np.log10(Amp_norm_travel) # cut off Amp_PSD_norm before 0
 
 
     # save data as csv
@@ -96,16 +109,46 @@ for i in range(5):
         return plt
 
 
-    def plt_PSD():
-        plt.figure(figsize=(10, 4))
-        plt.plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
-        plt.title(data_name.split('.')[0], size = 16)
-        plt.xlabel('Delay Time [s]', size = 14)
-        plt.ylabel('PSD [dB/Hz]', size = 14)
+    def plot_4panel():
+        fig, ax = plt.subplots(4, 1, sharex='all', tight_layout=True, figsize=(10, 10))
+
+        ax[0].plot(tau[1:int(N/2)], Amp[1:int(N/2)])
+        ax[0].set_ylabel('Amplitude [V]', size = 14)
+        ax[0].grid()
+
+        ax[1].plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
+        ax[1].set_ylabel('Normalized Power [dB]', size = 14)
+        ax[1].grid()
+
+        ax[2].plot(tau_travel, Amp_travel)
+        ax[2].set_ylabel('Amplitude [V]', size = 14)
+        ax[2].grid()
+
+        ax[3].plot(tau_travel, Amp_PSD_norm_travel)
+        ax[3].set_ylabel('Normalized Power [dB]', size = 14)
+        ax[3].grid()
+
+        fig.suptitle(data_name.split('.')[0], size = 16)
+        fig.supxlabel('Delay Time [s]', size = 14)
         plt.xlim(0, 100e-9)
-        plt.ylim(-35, 0)
-        #plt.xscale('log')
-        plt.grid()
+
+        plt.savefig(out_dir + '/compare_tau.png', dpi=300)
+        plt.show()
+
+        return plt
+
+
+
+    def plt_PSD():
+        fig, ax = plt.subplots(5, 1, tight_layout=True, figsize=(10, 10), sharex='all')
+        ax[i].set_title(data_name.split('.')[0], size = 16)
+        ax[i].plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
+        ax[i].grid()
+        ax[i].set_xlim(0, 100e-9)
+
+        fig.supxlabel('Delay Time [s]', size = 14)
+        fig.supylabel('Normalized Power [dB]', size = 14)
+
 
         plt.savefig(out_dir + '/tau_PSD.png', dpi=300)
         plt.show()
@@ -114,6 +157,8 @@ for i in range(5):
     
     if args.plot_type == '3panels':
         plot_3panel()
+    elif args.plot_type == '4panels':
+        plot_4panel()
     elif args.plot_type == 'single':
         plt_PSD()
 

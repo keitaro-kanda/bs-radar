@@ -102,7 +102,7 @@ delvider = axgrid1.make_axes_locatable(ax)
 cax = delvider.append_axes('right', size='5%', pad=0.1)
 plt.colorbar(cax=cax, label = 'correration')
 
-#plt.savefig('corr/corr.png', dpi=300)
+plt.savefig('corr/corr.png', dpi=300)
 plt.show()
 
 

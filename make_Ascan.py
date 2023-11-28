@@ -138,9 +138,10 @@ def plot_Ascan_travel():
         ax[i].set_title(title, size=16)
         ax[i].grid()
 
+    fig.suptitle('A-scan travel', size = 16)
     fig.supxlabel('Delay Time [s]', size = 14)
     fig.supylabel('Amplitude [V]', size = 14)
-    plt.xlim(0, 100e-9)
+    plt.xlim(0, 10e-9)
     plt.ylim(0, 45)
     #plt.xscale('log')
 

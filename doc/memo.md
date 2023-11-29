@@ -77,6 +77,29 @@ $$
 となる．
 
 
+# Relation between $\Delta R$ and $\Delta \tau$
+空間分解能$\Delta R$の見積り：
+$$
+\Delta R = \frac{c}{2 \Delta F \sqrt{\varepsilon_r}}
+$$
+ただし，$\Delta F$は周波数の変調幅である．
+この式では前項目で登場したような，周波数分解能やデータ数は含まれていないが，前項目で導出した遅れ時間の分解能$\Delta \tau$の結果とは矛盾しない：
+$$
+\begin{split}
+\Delta R &= \frac{v \Delta \tau}{2} \\
+&= \frac{1}{2} \frac{f_z / N}{\dot{\omega}} \frac{c}{\sqrt{\varepsilon_r}} \\
+\end{split}
+$$
+$f_s = N / T$（$T$はパルス長）より，
+$$
+\begin{split}
+\Delta R &= \frac{1}{2} \frac{f_z / N}{\dot{\omega}} \frac{c}{\sqrt{\varepsilon_r}} \\
+&= \frac{c}{2 N \dot{\omega} \sqrt{\varepsilon_r}} \\
+&= \frac{c}{2 \Delta F \sqrt{\varepsilon_r}}
+\end{split}
+$$
+が得られる．
+
 # Estimating some representative $\tau$
 
 TX5-RX1の場合

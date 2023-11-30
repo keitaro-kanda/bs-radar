@@ -64,15 +64,27 @@ for i in tqdm(range(len(V_RMS))):
         delay_time3 = np.sqrt(t**2 + (RX3.distance / v)**2) 
         delay_time4 = np.sqrt(t**2 + (RX4.distance / v)**2) 
 
-        index1 = round(delay_time1 / delta_tau)
-        index2 = round(delay_time2 / delta_tau)
-        index3 = round(delay_time3 / delta_tau)
-        index4 = round(delay_time4 / delta_tau)
+        index1 = int(delay_time1 / delta_tau)
+        index2 = int(delay_time2 / delta_tau)
+        index3 = int(delay_time3 / delta_tau)
+        index4 = int(delay_time4 / delta_tau)
 
-        f1 = RX1.AS_ave[index1]
-        f2 = RX2.AS_ave[index2]
-        f3 = RX3.AS_ave[index3]
-        f4 = RX4.AS_ave[index4]
+        #f1 = (RX1.AS[index1] + RX1.AS[index1+1]) / 2
+        #f2 = (RX2.AS[index2] + RX2.AS[index2+1]) / 2
+        #f3 = (RX3.AS[index3] + RX3.AS[index3+1]) / 2
+        #f4 = (RX4.AS[index4] + RX4.AS[index4+1]) / 2
+        f1 = (RX1.AS_ave[index1] + RX1.AS_ave[index1+1]) / 2
+        f2 = (RX2.AS_ave[index2] + RX2.AS_ave[index2+1]) / 2
+        f3 = (RX3.AS_ave[index3] + RX3.AS_ave[index3+1]) / 2
+        f4 = (RX4.AS_ave[index4] + RX4.AS_ave[index4+1]) / 2
+        #f1 = (RX1.AS[index1-1] + RX1.AS[index1] + RX1.AS[index1+1]) / 3
+        #f2 = (RX2.AS[index2-1] + RX2.AS[index2] + RX2.AS[index2+1]) / 3
+        #f3 = (RX3.AS[index3-1] + RX3.AS[index3] + RX3.AS[index3+1]) / 3
+        #f4 = (RX4.AS[index4-1] + RX4.AS[index4] + RX4.AS[index4+1]) / 3
+        #f1 = RX1.AS_ave[index1]
+        #f2 = RX2.AS_ave[index2]
+        #f3 = RX3.AS_ave[index3]
+        #f4 = RX4.AS_ave[index4]
         
         #f1 = RX1.AS[(delay_time1 - delta_tau/2 < RX1.time) & (RX1.time < delay_time1 + delta_tau/2)].values[0]
         #f2 = RX2.AS[(delay_time2 - delta_tau/2 < RX2.time) & (RX2.time < delay_time2 + delta_tau/2)].values[0]

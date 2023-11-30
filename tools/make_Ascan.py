@@ -42,7 +42,8 @@ class make_Ascan:
         self.PSD_norm = 10 * np.log10(self.PSD_norm) # Power Spectrum Density normalized, [dB/Hz]
 
         # running average
-        self.Amp_ave = pd.Series(self.Amp).rolling(3, min_periods=1).mean().values
+        mean_window = 2
+        self.Amp_ave = pd.Series(self.Amp).rolling(mean_window, center=True, min_periods=1).mean().values
 
         # =====calculate tau=====
         freq_start = 0.3e9
@@ -66,7 +67,7 @@ class make_Ascan:
         self.PSD_norm_travel = 10 * np.log10(self.PSD_norm_travel) # Power Spectrum Density normalized, [dB/Hz]
 
         # running average
-        self.Amp_travel_ave = pd.Series(self.Amp_travel).rolling(2, min_periods=1).mean().values
+        self.Amp_travel_ave = pd.Series(self.Amp_travel).rolling(mean_window, min_periods=1, center=True, win_type=None).mean().values
         
 
 RX1 = make_Ascan()
@@ -110,6 +111,7 @@ save_data(RX4)
 save_data(Through)
 
 # =====plot=====
+xlim_up = 100e-9
 def plot_Ascan():
     fig, ax = plt.subplots(5, 1, sharex='all', sharey='all', tight_layout=True, figsize=(10, 10))
 
@@ -124,11 +126,11 @@ def plot_Ascan():
 
     #fig.supxlabel('Delay Time [s]', size = 14)
     #fig.supylabel('Amplitude [V]', size = 14)
-    plt.xlim(0, 100e-9)
+    plt.xlim(0, xlim_up)
     plt.ylim(0, 45)
     #plt.xscale('log')
 
-    plt.savefig('results//Ascan_raw.png', dpi=300)
+    plt.savefig('results/Ascan/Ascan_raw.png', dpi=300)
     plt.show()
     return plt
 
@@ -148,7 +150,7 @@ def plot_Ascan_travel():
     fig.suptitle('A-scan travel', size = 16)
     #fig.supxlabel('Delay Time [s]', size = 14)
     #fig.supylabel('Amplitude [V]', size = 14)
-    plt.xlim(0, 20e-9)
+    plt.xlim(0, xlim_up)
     plt.ylim(0, 45)
     #plt.xscale('log')
 

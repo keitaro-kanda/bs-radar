@@ -44,6 +44,8 @@ class make_Ascan:
         self.PSD_norm = self.ASD / np.max(self.ASD[1:int(N/2)]) # normalize
         self.PSD_norm = 10 * np.log10(self.PSD_norm) # Power Spectrum Density normalized, [dB/Hz]
 
+        # running average
+        self.Amp_ave = pd.Series(self.Amp).rolling(2).mean().values
 
         # =====calculate tau=====
         freq_start = 0.3e9
@@ -52,7 +54,9 @@ class make_Ascan:
         self.tau = self.Freq / sweep_rate # delay time not consider delay in cable [s]
 
         # consider delay in cable
-        cable_delay = 4.448784722222222e-08 # delay time while signal travels through cable [s]
+        cable_delay1 = 4.448784722222222e-08 # delay time while signal travels through cable [s]
+        cable_delay2 = 4.503038194444444e-08 # delay time while signal travels through cable [s]
+        cable_delay = (cable_delay1 + cable_delay2) / 2
         self.tau_travel = self.tau - cable_delay
         self.tau_travel_0index = np.where(self.tau_travel >= 0)[0][0]
 
@@ -65,7 +69,7 @@ class make_Ascan:
 
         # running average
         self.Amp_travel_ave = pd.Series(self.Amp_travel).rolling(2).mean().values
-        #print(len(self.Amp_travel_ave))
+        
 
 RX1 = make_Ascan()
 RX1.data_name = 'TX5-RX1.csv'
@@ -116,12 +120,13 @@ def plot_Ascan():
 
     for i, (RX, title) in enumerate(zip(RXs, titles)):
         ax[i].plot(RX.tau[1:int(len(RX.tau)/2)], RX.Amp[1:int(len(RX.Amp)/2)])
+        ax[i].plot(RX.tau[1:int(len(RX.tau)/2)], RX.Amp_ave[1:int(len(RX.Amp_ave)/2)])
         ax[i].set_title(title, size=16)
         ax[i].grid()
 
-    fig.supxlabel('Delay Time [s]', size = 14)
-    fig.supylabel('Amplitude [V]', size = 14)
-    plt.xlim(4.2e-8, 5.2e-8)
+    #fig.supxlabel('Delay Time [s]', size = 14)
+    #fig.supylabel('Amplitude [V]', size = 14)
+    plt.xlim(0, 100e-9)
     plt.ylim(0, 45)
     #plt.xscale('log')
 

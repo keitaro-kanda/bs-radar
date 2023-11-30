@@ -88,12 +88,12 @@ for i in tqdm(range(len(V_RMS))):
 
 
 # normalize
-corr = corr / np.max(corr) * 5
+#corr = corr / np.max(corr) * 5
 # =====plot=====
 fig, ax = plt.subplots(1, 1, tight_layout=True, figsize=(8, 6))
 plt.imshow(corr,
             extent=[0, len(V_RMS)*0.01, max_tau, 0], 
-            cmap='inferno', aspect='auto')
+            cmap='gnuplot', aspect='auto')
 
 plt.xlabel('RMS Velocity [/c]')
 plt.ylabel('tau (2-way travel time) [ns]')

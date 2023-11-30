@@ -9,8 +9,8 @@ import scipy.fftpack as fft
 # ======load files=====
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Calculate delay time and plot A-scan.', 
-                                 usage='cd bs-radar; python -m tools.make_Ascan plot_type')
-parser.add_argument('plot_type', choices=['Ascan_raw', 'Ascan_travel'], help='plot type')
+                                usage='cd bs-radar; python -m tools.make_Ascan plot_type')
+parser.add_argument('plot_type', choices=['raw', 'travel'], help='plot type')
 args = parser.parse_args()
 
 
@@ -130,7 +130,7 @@ def plot_Ascan():
     plt.ylim(0, 45)
     #plt.xscale('log')
 
-    plt.savefig('Ascan/Ascan_raw.png', dpi=300)
+    plt.savefig('results//Ascan_raw.png', dpi=300)
     plt.show()
     return plt
 
@@ -154,14 +154,16 @@ def plot_Ascan_travel():
     plt.ylim(0, 45)
     #plt.xscale('log')
 
-    plt.savefig('Ascan/Ascan_travel.png', dpi=300)
+    plt.savefig('results/Ascan/Ascan_travel.png', dpi=300)
     plt.show()
     return plt
 
-if args.plot_type == 'Ascan_raw':
+if args.plot_type == 'raw':
     plot_Ascan()
-elif args.plot_type == 'Ascan_travel':
+elif args.plot_type == 'travel':
     plot_Ascan_travel()
+else:
+    print('Error: plot_type is invalid. Choose raw or travel.')
 
 """
 # 以下，元のコード

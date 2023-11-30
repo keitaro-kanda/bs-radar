@@ -24,7 +24,8 @@ class make_Ascan:
         #self.Output = None
     
     def calc_tau(self):
-        self.data = pd.read_csv(self.data_name, header=None, skiprows=19)
+        data_dir = 'source_data/'
+        self.data = pd.read_csv(data_dir + self.data_name, header=None, skiprows=19)
         self.Time = self.data[0]
         self.Input = self.data[1]
         self.Output = self.data[2]
@@ -45,7 +46,7 @@ class make_Ascan:
         self.PSD_norm = 10 * np.log10(self.PSD_norm) # Power Spectrum Density normalized, [dB/Hz]
 
         # running average
-        self.Amp_ave = pd.Series(self.Amp).rolling(2).mean().values
+        self.Amp_ave = pd.Series(self.Amp).rolling(2, min_periods=1).mean().values
 
         # =====calculate tau=====
         freq_start = 0.3e9
@@ -54,9 +55,9 @@ class make_Ascan:
         self.tau = self.Freq / sweep_rate # delay time not consider delay in cable [s]
 
         # consider delay in cable
-        cable_delay1 = 4.448784722222222e-08 # delay time while signal travels through cable [s]
-        cable_delay2 = 4.503038194444444e-08 # delay time while signal travels through cable [s]
-        cable_delay = (cable_delay1 + cable_delay2) / 2
+        cable_delay = 4.448784722222222e-08 # delay time while signal travels through cable [s]
+        #cable_delay2 = 4.503038194444444e-08 # delay time while signal travels through cable [s]
+        #cable_delay = (cable_delay1 + cable_delay2) / 2
         self.tau_travel = self.tau - cable_delay
         self.tau_travel_0index = np.where(self.tau_travel >= 0)[0][0]
 
@@ -68,7 +69,7 @@ class make_Ascan:
         self.PSD_norm_travel = 10 * np.log10(self.PSD_norm_travel) # Power Spectrum Density normalized, [dB/Hz]
 
         # running average
-        self.Amp_travel_ave = pd.Series(self.Amp_travel).rolling(2).mean().values
+        self.Amp_travel_ave = pd.Series(self.Amp_travel).rolling(2, min_periods=1).mean().values
         
 
 RX1 = make_Ascan()

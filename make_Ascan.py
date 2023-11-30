@@ -39,10 +39,10 @@ class make_Ascan:
         out_fft = fft.fft(self.Output.values) # .valuesをつけるとSeries型からndarray型に変換できる
         self.Freq = fft.fftfreq(N, 1/fs) # [Hz]
         self.Amp = np.abs(out_fft) # Amplitude Spectrum, [V]
-        self.Amp_ASD = np.sqrt(self.Amp**2 / (fs/N)) # Amplitude Spectrum Density, [V/√Hz]
-        self.Amp_PSD = 10 * np.log10(self.Amp_ASD) # Amplitude Spectrum Density, [dB/Hz]
-        self.Amp_norm = self.Amp_ASD / np.max(self.Amp_ASD[1:int(N/2)]) # normalize
-        self.Amp_PSD_norm = 10 * np.log10(self.Amp_norm) # Power Spectrum Density normalized, [dB/Hz]
+        self.ASD = np.sqrt(self.Amp**2 / (fs/N)) # Amplitude Spectrum Density, [V/√Hz]
+        self.PSD = 10 * np.log10(self.ASD) # power Spectrum Density, [dB/Hz]
+        self.PSD_norm = self.ASD / np.max(self.ASD[1:int(N/2)]) # normalize
+        self.PSD_norm = 10 * np.log10(self.PSD_norm) # Power Spectrum Density normalized, [dB/Hz]
 
 
         # =====calculate tau=====
@@ -57,12 +57,14 @@ class make_Ascan:
         self.tau_travel_0index = np.where(self.tau_travel >= 0)[0][0]
 
         self.tau_travel = self.tau_travel[self.tau_travel_0index:int(N/2)] # cut off tau_travel before 0
-        self.Amp_travel = self.Amp[self.tau_travel_0index:int(N/2)] # Amplitude Spectrum Density, [V/√Hz]
-        self.Amp_ASD_travel = self.Amp_ASD[self.tau_travel_0index:int(N/2)] # Amplitude Spectrum Density, [V/√Hz]
-        self.Amp_PSD_travel = 10 * np.log10(self.Amp_ASD_travel) # Amplitude Spectrum Density, [dB/Hz]
-        self.Amp_norm_travel = self.Amp_ASD_travel / np.max(self.Amp_ASD_travel) # normalize
-        self.Amp_PSD_norm_travel = 10 * np.log10(self.Amp_norm_travel) # Power Spectrum Density normalized, [dB/Hz]
+        self.Amp_travel = self.Amp[self.tau_travel_0index:int(N/2)] # Amplitude Spectrum [V]
+        self.ASD_travel = self.ASD[self.tau_travel_0index:int(N/2)] # Amplitude Spectrum Density, [V/√Hz]
+        self.PSD_travel = 10 * np.log10(self.ASD_travel) # power Spectrum Density, [dB/Hz]
+        self.PSD_norm_travel = self.ASD_travel / np.max(self.ASD_travel) # normalize
+        self.PSD_norm_travel = 10 * np.log10(self.PSD_norm_travel) # Power Spectrum Density normalized, [dB/Hz]
 
+        # running average
+        self.PSD_norm_travel_ave = pd.Series(self.Amp).rolling(3).mean().values
 
 RX1 = make_Ascan()
 RX1.data_name = 'TX5-RX1.csv'
@@ -87,7 +89,7 @@ Through.calc_tau()
 
 # =====save data as csv=====
 def save_data(RX):
-    data = np.vstack((RX.tau_travel, RX.Amp_travel, RX.Amp_PSD_norm_travel))
+    data = np.vstack((RX.tau_travel, RX.Amp_travel, RX.PSD_norm_travel))
     data = data.T
     # add header
     header = ['2way travel time [s]', 'AS [V]', 'PSD [dB/Hz]']
@@ -185,10 +187,10 @@ for i in range(5):
     out_fft = fft.fft(Output)
     Freq = fft.fftfreq(N, 1/fs)
     Amp = np.abs(out_fft) # Amplitude Spectrum, [V]
-    Amp_ASD = np.sqrt(Amp**2 / (fs/N)) # Amplitude Spectrum Density, [V/√Hz]
-    Amp_PSD = 10 * np.log10(Amp_ASD) # Amplitude Spectrum Density, [dB/Hz]
-    Amp_norm = Amp_ASD / np.max(Amp_ASD[1:int(N/2)]) # normalize
-    Amp_PSD_norm = 10 * np.log10(Amp_norm) # Power Spectrum Density normalized, [dB/Hz]
+    ASD = np.sqrt(Amp**2 / (fs/N)) # Amplitude Spectrum Density, [V/√Hz]
+    PSD = 10 * np.log10(ASD) # Amplitude Spectrum Density, [dB/Hz]
+    PSD_norm = ASD / np.max(ASD[1:int(N/2)]) # normalize
+    PSD_norm = 10 * np.log10(PSD_norm) # Power Spectrum Density normalized, [dB/Hz]
 
 
 
@@ -205,14 +207,14 @@ for i in range(5):
     print('tau_travel_0index =', tau_travel_0index)
     tau_travel = tau_travel[tau_travel_0index:int(N/2)] # cut off tau_travel before 0
     Amp_travel = Amp[tau_travel_0index:int(N/2)] # cut off Amp before 0
-    Amp_ASD_travel = Amp_ASD[tau_travel_0index:int(N/2)] # cut off Amp_ASD before 0
-    Amp_PSD_travel = 10 * np.log10(Amp_ASD_travel) # Amplitude Spectrum Density, [dB/Hz]
-    Amp_norm_travel = Amp_ASD_travel / np.max(Amp_ASD_travel) # normalize
-    Amp_PSD_norm_travel = 10 * np.log10(Amp_norm_travel) # cut off Amp_PSD_norm before 0
+    ASD_travel = ASD[tau_travel_0index:int(N/2)] # cut off ASD before 0
+    PSD_travel = 10 * np.log10(ASD_travel) # Amplitude Spectrum Density, [dB/Hz]
+    PSD_norm_travel = ASD_travel / np.max(ASD_travel) # normalize
+    PSD_norm_travel = 10 * np.log10(PSD_norm_travel) # cut off PSD_norm before 0
 
 
     # save data as csv
-    data = np.vstack((tau, Amp, Amp_ASD, Amp_PSD_norm))
+    data = np.vstack((tau, Amp, ASD, PSD_norm))
     data = data.T
     # add header
     header = ['tau [s]', 'AS [V]', 'ASD [V/√Hz]', 'PSD [dB/Hz]']
@@ -232,11 +234,11 @@ for i in range(5):
         ax[0].set_ylabel('Amplitude [V]', size = 14)
         ax[0].grid()
 
-        ax[1].plot(tau[1:int(N/2)], Amp_PSD[1:int(N/2)])
+        ax[1].plot(tau[1:int(N/2)], PSD[1:int(N/2)])
         ax[1].set_ylabel('Power [dB]', size = 14)
         ax[1].grid()
 
-        ax[2].plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
+        ax[2].plot(tau[1:int(N/2)], PSD_norm[1:int(N/2)])
         ax[2].set_ylabel('Normalized Power [dB]', size = 14)
         ax[2].grid()
 
@@ -257,7 +259,7 @@ for i in range(5):
         ax[0].set_ylabel('Amplitude [V]', size = 14)
         ax[0].grid()
 
-        ax[1].plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
+        ax[1].plot(tau[1:int(N/2)], PSD_norm[1:int(N/2)])
         ax[1].set_ylabel('Normalized Power [dB]', size = 14)
         ax[1].grid()
 
@@ -265,7 +267,7 @@ for i in range(5):
         ax[2].set_ylabel('Amplitude [V]', size = 14)
         ax[2].grid()
 
-        ax[3].plot(tau_travel, Amp_PSD_norm_travel)
+        ax[3].plot(tau_travel, PSD_norm_travel)
         ax[3].set_ylabel('Normalized Power [dB]', size = 14)
         ax[3].grid()
 
@@ -283,7 +285,7 @@ for i in range(5):
     def plt_PSD():
         fig, ax = plt.subplots(5, 1, tight_layout=True, figsize=(10, 10), sharex='all')
         ax[i].set_title(data_name.split('.')[0], size = 16)
-        ax[i].plot(tau[1:int(N/2)], Amp_PSD_norm[1:int(N/2)])
+        ax[i].plot(tau[1:int(N/2)], PSD_norm[1:int(N/2)])
         ax[i].grid()
         ax[i].set_xlim(0, 100e-9)
 
@@ -309,11 +311,11 @@ def Ascan_plot_1sheet():
     N = len(tau1) # data size
     # =====plot=====
     plt.figure(figsize=(10, 10))
-    plt.plot(tau1[1:int(N/2)], Amp_PSD1[1: int(N/2)]-50, label='TX5-RX1')
-    plt.plot(tau2[1:int(N/2)], Amp_PSD2[1: int(N/2)]-100, label='TX5-RX2')
-    plt.plot(tau3[1:int(N/2)], Amp_PSD3[1: int(N/2)]-150, label='TX5-RX3')
-    plt.plot(tau4[1:int(N/2)], Amp_PSD4[1: int(N/2)]-200, label='TX5-RX4')
-    plt.plot(tau0[1:int(N/2)], Amp_PSD0[1: int(N/2)], label='Through')
+    plt.plot(tau1[1:int(N/2)], PSD1[1: int(N/2)]-50, label='TX5-RX1')
+    plt.plot(tau2[1:int(N/2)], PSD2[1: int(N/2)]-100, label='TX5-RX2')
+    plt.plot(tau3[1:int(N/2)], PSD3[1: int(N/2)]-150, label='TX5-RX3')
+    plt.plot(tau4[1:int(N/2)], PSD4[1: int(N/2)]-200, label='TX5-RX4')
+    plt.plot(tau0[1:int(N/2)], PSD0[1: int(N/2)], label='Through')
 
     plt.xlabel('Delay Time [s]', size = 14)
     plt.ylabel('PSD [dB/Hz]', size = 14)
@@ -330,8 +332,8 @@ def Ascan_plot_1sheet():
 
 
 
-def plot_1by1(tau, Amp_PSD, data_name, out_dir):
-    plt.plot(tau[1:int(len(tau)/2)], Amp_PSD[1:int(len(Amp_PSD)/2)])
+def plot_1by1(tau, PSD, data_name, out_dir):
+    plt.plot(tau[1:int(len(tau)/2)], PSD[1:int(len(PSD)/2)])
 
     plt.title(data_name.split('.')[0], size = 16)
     plt.xlabel('Delay Time [s]', size = 14)
@@ -345,9 +347,9 @@ def plot_1by1(tau, Amp_PSD, data_name, out_dir):
 
     return plt
 """
-plot_1by1(tau1, Amp_PSD1, 'TX5-RX1.csv', out_dir1)
-plot_1by1(tau2, Amp_PSD2, 'TX5-RX2.csv', out_dir2)
-plot_1by1(tau3, Amp_PSD3, 'TX5-RX3.csv', out_dir3)
-plot_1by1(tau4, Amp_PSD4, 'TX5-RX4.csv', out_dir4)
-plot_1by1(tau0, Amp_PSD0, 'Through.csv', out_dir0)
+plot_1by1(tau1, PSD1, 'TX5-RX1.csv', out_dir1)
+plot_1by1(tau2, PSD2, 'TX5-RX2.csv', out_dir2)
+plot_1by1(tau3, PSD3, 'TX5-RX3.csv', out_dir3)
+plot_1by1(tau4, PSD4, 'TX5-RX4.csv', out_dir4)
+plot_1by1(tau0, PSD0, 'Through.csv', out_dir0)
 """

@@ -51,8 +51,8 @@ class make_Ascan:
         self.tau = self.Freq / sweep_rate # delay time not consider delay in cable [s]
 
         # consider delay in cable
-        cable_delay = 4.2317708333333334e-08
-        #cable_delay = 4.448784722222222e-08 # delay time while signal travels through cable [s]
+        #cable_delay = 4.2317708333333334e-08
+        cable_delay = 4.448784722222222e-08 # delay time while signal travels through cable [s]
         #cable_delay2 = 4.503038194444444e-08 # delay time while signal travels through cable [s]
         #cable_delay = (cable_delay1 + cable_delay2) / 2
         self.tau_travel = self.tau - cable_delay

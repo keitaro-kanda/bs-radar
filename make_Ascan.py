@@ -64,7 +64,8 @@ class make_Ascan:
         self.PSD_norm_travel = 10 * np.log10(self.PSD_norm_travel) # Power Spectrum Density normalized, [dB/Hz]
 
         # running average
-        self.PSD_norm_travel_ave = pd.Series(self.Amp).rolling(3).mean().values
+        self.Amp_travel_ave = pd.Series(self.Amp_travel).rolling(2).mean().values
+        #print(len(self.Amp_travel_ave))
 
 RX1 = make_Ascan()
 RX1.data_name = 'TX5-RX1.csv'
@@ -89,10 +90,10 @@ Through.calc_tau()
 
 # =====save data as csv=====
 def save_data(RX):
-    data = np.vstack((RX.tau_travel, RX.Amp_travel, RX.PSD_norm_travel))
+    data = np.vstack((RX.tau_travel, RX.Amp_travel, RX.Amp_travel_ave, RX.PSD_norm_travel))
     data = data.T
     # add header
-    header = ['2way travel time [s]', 'AS [V]', 'PSD [dB/Hz]']
+    header = ['2way travel time [s]', 'AS [V]', 'Running average of AS [V]',  'PSD [dB/Hz]']
     data = np.vstack((header, data))
 
     out_dir = 'Ascan/' + RX.data_name.split('.')[0]
@@ -137,13 +138,14 @@ def plot_Ascan_travel():
 
     for i, (RX, title) in enumerate(zip(RXs, titles)):
         ax[i].plot(RX.tau_travel, RX.Amp_travel)
+        ax[i].plot(RX.tau_travel, RX.Amp_travel_ave)
         ax[i].set_title(title, size=16)
         ax[i].grid()
 
     fig.suptitle('A-scan travel', size = 16)
-    fig.supxlabel('Delay Time [s]', size = 14)
-    fig.supylabel('Amplitude [V]', size = 14)
-    plt.xlim(0, 10e-9)
+    #fig.supxlabel('Delay Time [s]', size = 14)
+    #fig.supylabel('Amplitude [V]', size = 14)
+    plt.xlim(0, 20e-9)
     plt.ylim(0, 45)
     #plt.xscale('log')
 

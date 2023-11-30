@@ -15,7 +15,8 @@ class read_Ascan_data:
         data = pd.read_csv(self.file_path, header=None, skiprows=1)
         self.time = data[0] # 2way travel time [s]
         self.AS = data[1] # Amplitude Spectrum, [V]
-        self.PSD = data[2] # Power Spectrum Density, [dB/Hz]
+        self.AS_ave = data[2]
+        self.PSD = data[3] # Power Spectrum Density, [dB/Hz]
         self.distance = 0.2 * (5 - i) # [m]
 
 RX1 = read_Ascan_data()
@@ -68,10 +69,11 @@ for i in tqdm(range(len(V_RMS))):
         index3 = round(delay_time3 / delta_tau)
         index4 = round(delay_time4 / delta_tau)
 
-        f1 = RX1.AS[index1]
-        f2 = RX2.AS[index2]
-        f3 = RX3.AS[index3]
-        f4 = RX4.AS[index4]
+        f1 = RX1.AS_ave[index1]
+        f2 = RX2.AS_ave[index2]
+        f3 = RX3.AS_ave[index3]
+        f4 = RX4.AS_ave[index4]
+        
         #f1 = RX1.AS[(delay_time1 - delta_tau/2 < RX1.time) & (RX1.time < delay_time1 + delta_tau/2)].values[0]
         #f2 = RX2.AS[(delay_time2 - delta_tau/2 < RX2.time) & (RX2.time < delay_time2 + delta_tau/2)].values[0]
         #f3 = RX3.AS[(delay_time3 - delta_tau/2 < RX3.time) & (RX3.time < delay_time3 + delta_tau/2)].values[0]
@@ -86,7 +88,7 @@ for i in tqdm(range(len(V_RMS))):
 
 
 # normalize
-corr = corr
+corr = corr / np.max(corr) * 5
 # =====plot=====
 fig, ax = plt.subplots(1, 1, tight_layout=True, figsize=(8, 6))
 plt.imshow(corr,

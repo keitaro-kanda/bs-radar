@@ -11,7 +11,7 @@ class read_Ascan_data:
         self.RX_num = 0
     
     def read_Ascan(self, i):
-        self.file_path = 'Ascan/TX5-RX' + str(i)  + '/Ascan_data_travel.csv'
+        self.file_path = 'results/Ascan/TX5-RX' + str(i)  + '/Ascan_data_travel.csv'
         data = pd.read_csv(self.file_path, header=None, skiprows=1)
         self.time = data[0] # 2way travel time [s]
         self.AS = data[1] # Amplitude Spectrum, [V]
@@ -104,7 +104,7 @@ delvider = axgrid1.make_axes_locatable(ax)
 cax = delvider.append_axes('right', size='5%', pad=0.1)
 plt.colorbar(cax=cax, label = 'correration')
 
-plt.savefig('corr/corr.png', dpi=300)
+plt.savefig('results/corr/corr.png', dpi=300)
 plt.show()
 
 

@@ -9,7 +9,7 @@ import scipy.fftpack as fft
 # ======load files=====
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Calculate delay time and plot A-scan.', 
-                                 usage='cd bs-radar; python make_Ascan.py plot_type')
+                                 usage='cd bs-radar; python -m tools.make_Ascan plot_type')
 parser.add_argument('plot_type', choices=['Ascan_raw', 'Ascan_travel'], help='plot type')
 args = parser.parse_args()
 
@@ -100,7 +100,7 @@ def save_data(RX):
     header = ['2way travel time [s]', 'AS [V]', 'Running average of AS [V]',  'PSD [dB/Hz]']
     data = np.vstack((header, data))
 
-    out_dir = 'Ascan/' + RX.data_name.split('.')[0]
+    out_dir = 'results/Ascan/' + RX.data_name.split('.')[0]
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     np.savetxt(out_dir + '/Ascan_data_travel.csv', data, delimiter=',', fmt='%s')
